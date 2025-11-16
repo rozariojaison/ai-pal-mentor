@@ -1,6 +1,10 @@
 import { Brain, Github, Mail, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const Footer = () => {
+  const navigate = useNavigate();
+
   return (
     <footer className="border-t border-border/50 bg-muted/30">
       <div className="container mx-auto px-4 py-12">
@@ -33,34 +37,35 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Technology</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>TensorFlow Lite</li>
-              <li>FastAPI</li>
-              <li>Docker</li>
-              <li>Python 3.8+</li>
+              <li>Lovable Cloud</li>
+              <li>Lovable AI</li>
+              <li>React & TypeScript</li>
+              <li>PostgreSQL</li>
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Resources */}
           <div>
             <h4 className="font-semibold mb-4">Resources</h4>
             <div className="space-y-3">
-              <a 
-                href="#" 
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 h-auto p-2 text-sm"
+                onClick={() => navigate("/docs")}
               >
                 <FileText className="w-4 h-4" />
                 Documentation
-              </a>
-              <a 
-                href="#" 
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+              </Button>
+              <a
+                href="#"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors p-2"
               >
                 <Github className="w-4 h-4" />
                 Source Code
               </a>
-              <a 
-                href="#" 
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+              <a
+                href="#"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors p-2"
               >
                 <Mail className="w-4 h-4" />
                 Contact Us

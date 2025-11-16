@@ -1,13 +1,40 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Brain, Code2, Sparkles } from "lucide-react";
+import { ArrowRight, Brain, Code2, Sparkles, LogIn } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   const scrollToDemo = () => {
     document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-secondary/5 to-background">
+      {/* Auth button */}
+      <div className="absolute top-4 right-4 z-10">
+        {user ? (
+          <Button
+            variant="outline"
+            onClick={() => navigate("/dashboard")}
+            className="border-primary/20 bg-background/80 backdrop-blur"
+          >
+            Dashboard
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            onClick={() => navigate("/auth")}
+            className="gap-2 border-primary/20 bg-background/80 backdrop-blur"
+          >
+            <LogIn className="w-4 h-4" />
+            Sign In
+          </Button>
+        )}
+      </div>
+
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
