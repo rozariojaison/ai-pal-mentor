@@ -14,7 +14,149 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analysis_results: {
+        Row: {
+          adaptive_hint: string | null
+          clarity_analysis: string | null
+          clarity_score: number | null
+          code_best_practices: string | null
+          code_efficiency: string | null
+          code_suggestions: string[] | null
+          conceptual_gaps: string[] | null
+          conceptual_understanding: string | null
+          created_at: string | null
+          id: string
+          interaction_id: string
+          misconceptions: string[] | null
+          suggested_next_topic: string | null
+          user_id: string
+        }
+        Insert: {
+          adaptive_hint?: string | null
+          clarity_analysis?: string | null
+          clarity_score?: number | null
+          code_best_practices?: string | null
+          code_efficiency?: string | null
+          code_suggestions?: string[] | null
+          conceptual_gaps?: string[] | null
+          conceptual_understanding?: string | null
+          created_at?: string | null
+          id?: string
+          interaction_id: string
+          misconceptions?: string[] | null
+          suggested_next_topic?: string | null
+          user_id: string
+        }
+        Update: {
+          adaptive_hint?: string | null
+          clarity_analysis?: string | null
+          clarity_score?: number | null
+          code_best_practices?: string | null
+          code_efficiency?: string | null
+          code_suggestions?: string[] | null
+          conceptual_gaps?: string[] | null
+          conceptual_understanding?: string | null
+          created_at?: string | null
+          id?: string
+          interaction_id?: string
+          misconceptions?: string[] | null
+          suggested_next_topic?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_results_interaction_id_fkey"
+            columns: ["interaction_id"]
+            isOneToOne: false
+            referencedRelation: "student_interactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string | null
+          id: string
+          student_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          student_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          student_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      student_interactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          input_content: string
+          input_type: string
+          programming_language: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          input_content: string
+          input_type: string
+          programming_language?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          input_content?: string
+          input_type?: string
+          programming_language?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_progress: {
+        Row: {
+          created_at: string | null
+          id: string
+          interactions_count: number | null
+          last_interaction_at: string | null
+          skill_level: number | null
+          topic: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          interactions_count?: number | null
+          last_interaction_at?: string | null
+          skill_level?: number | null
+          topic: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          interactions_count?: number | null
+          last_interaction_at?: string | null
+          skill_level?: number | null
+          topic?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
