@@ -47,6 +47,13 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        chart: {
+          "1": "hsl(217 91% 40%)",
+          "2": "hsl(188 95% 42%)",
+          "3": "hsl(33 100% 62%)",
+          "4": "hsl(217 91% 50%)",
+          "5": "hsl(var(--accent))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
