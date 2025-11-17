@@ -10,21 +10,52 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-const sampleCode = `def bubble_sort(arr):
+const demoQuestions = {
+  code: [
+    {
+      title: "Bubble Sort Implementation",
+      content: `def bubble_sort(arr):
     n = len(arr)
     for i in range(n):
         for j in range(0, n-i-1):
             if arr[j] > arr[j+1]:
                 arr[j], arr[j+1] = arr[j+1], arr[j]
-    return arr`;
-
-const sampleExplanation = `A linked list is a data structure where elements are stored in nodes. Each node contains data and a pointer to the next node. It's better than arrays because you can insert elements easily.`;
+    return arr`,
+      language: "Python"
+    },
+    {
+      title: "Factorial Function",
+      content: `function factorial(n) {
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
+}`,
+      language: "JavaScript"
+    },
+    {
+      title: "String Reversal",
+      content: `def reverse_string(s):
+    return s[::-1]`,
+      language: "Python"
+    }
+  ],
+  text: [
+    {
+      title: "Linked List Explanation",
+      content: `A linked list is a data structure where elements are stored in nodes. Each node contains data and a pointer to the next node. It's better than arrays because you can insert elements easily.`
+    },
+    {
+      title: "Binary Search Explanation",
+      content: `Binary search is an algorithm that finds the position of a target value within a sorted array. It works by repeatedly dividing the search interval in half and comparing the target to the middle element.`
+    }
+  ]
+};
 
 export const DemoReal = () => {
   const [input, setInput] = useState("");
-  const [activeTab, setActiveTab] = useState("text");
+  const [activeTab, setActiveTab] = useState<"text" | "code">("text");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<number>(0);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -34,17 +65,14 @@ export const DemoReal = () => {
       return;
     }
 
-    if (!user) {
-      toast.error("Please sign in to use AI analysis");
-      navigate("/auth");
-      return;
-    }
-
     setIsAnalyzing(true);
     setFeedback(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke("analyze-input", {
+      // Use demo function if not authenticated, otherwise use full analysis
+      const functionName = user ? "analyze-input" : "analyze-demo";
+      
+      const { data, error } = await supabase.functions.invoke(functionName, {
         body: {
           inputType: activeTab,
           inputContent: input,
@@ -78,12 +106,11 @@ export const DemoReal = () => {
     }
   };
 
-  const loadSample = () => {
-    if (activeTab === "code") {
-      setInput(sampleCode);
-    } else {
-      setInput(sampleExplanation);
-    }
+  const loadSample = (index: number) => {
+    setSelectedQuestion(index);
+    const questions = activeTab === "code" ? demoQuestions.code : demoQuestions.text;
+    const question = questions[index];
+    setInput(question.content);
     setFeedback(null);
   };
 
@@ -105,11 +132,16 @@ export const DemoReal = () => {
             </p>
           </div>
 
-          {!user && (
-            <Alert className="mb-6 border-primary/20 bg-primary/5">
-              <AlertCircle className="h-4 w-4 text-primary" />
-              <AlertDescription className="flex items-center justify-between">
-                <span>Sign in to unlock AI-powered analysis and track your progress</span>
+          <Alert className="mb-6 border-primary/20 bg-primary/5">
+            <AlertCircle className="h-4 w-4 text-primary" />
+            <AlertDescription className="flex items-center justify-between">
+              <span>
+                {user 
+                  ? "Select a sample question below or write your own to get personalized feedback"
+                  : "Try the demo with sample questions below - Sign in to save your progress and unlock full features"
+                }
+              </span>
+              {!user && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -118,9 +150,9 @@ export const DemoReal = () => {
                 >
                   Sign In
                 </Button>
-              </AlertDescription>
-            </Alert>
-          )}
+              )}
+            </AlertDescription>
+          </Alert>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Input Section */}
@@ -135,7 +167,7 @@ export const DemoReal = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "text" | "code")}>
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="text" className="gap-2">
                       <FileText className="w-4 h-4" />
@@ -164,10 +196,30 @@ export const DemoReal = () => {
                   </TabsContent>
                 </Tabs>
 
+                <div className="space-y-3">
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Sample Questions for Testing:
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    {(activeTab === "code" ? demoQuestions.code : demoQuestions.text).map((question, index) => (
+                      <Button
+                        key={index}
+                        variant={selectedQuestion === index ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => loadSample(index)}
+                        className="justify-start text-left h-auto py-2"
+                      >
+                        <span className="font-medium">{index + 1}.</span>
+                        <span className="ml-2 truncate">{question.title}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="flex gap-2">
                   <Button
                     onClick={handleAnalyze}
-                    disabled={isAnalyzing || !user}
+                    disabled={isAnalyzing}
                     className="flex-1 bg-gradient-to-r from-primary to-secondary hover:shadow-lg"
                   >
                     {isAnalyzing ? (
@@ -178,16 +230,9 @@ export const DemoReal = () => {
                     ) : (
                       <>
                         <Send className="mr-2 h-4 w-4" />
-                        Analyze
+                        Analyze with AI
                       </>
                     )}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={loadSample}
-                    className="border-primary/20"
-                  >
-                    Load Sample
                   </Button>
                 </div>
               </CardContent>
@@ -211,10 +256,7 @@ export const DemoReal = () => {
                       <Sparkles className="w-8 h-8 text-muted-foreground" />
                     </div>
                     <p className="text-muted-foreground">
-                      {user 
-                        ? "Submit your input to receive adaptive feedback from AI"
-                        : "Sign in to receive AI-powered feedback"
-                      }
+                      Select a sample question or write your own, then click "Analyze with AI" to receive intelligent feedback
                     </p>
                   </div>
                 ) : (
