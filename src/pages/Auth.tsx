@@ -19,6 +19,18 @@ export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp } = useAuth();
 
+  const handleDemoLogin = async () => {
+    setIsLoading(true);
+    const { error } = await signIn("demo@aipal.com", "demo123");
+    
+    if (error) {
+      toast.error("Demo account not available. Please create your own account.");
+    } else {
+      toast.success("Logged in as demo user!");
+    }
+    setIsLoading(false);
+  };
+
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -85,6 +97,24 @@ export default function Auth() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleDemoLogin}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : null}
+              Quick Demo Login
+            </Button>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Or sign in with your account
+            </p>
+          </div>
+          
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="signin">Sign In</TabsTrigger>

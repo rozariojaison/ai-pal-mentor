@@ -16,6 +16,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { DemoReal } from "@/components/DemoReal";
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -24,6 +25,7 @@ export default function Dashboard() {
   const [interactions, setInteractions] = useState<any[]>([]);
   const [progress, setProgress] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("analysis");
 
   useEffect(() => {
     if (!user) {
@@ -97,13 +99,6 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center gap-2">
               <Button
-                variant="outline"
-                onClick={() => navigate("/")}
-                className="border-primary/20"
-              >
-                Try Demo
-              </Button>
-              <Button
                 variant="ghost"
                 onClick={signOut}
                 className="gap-2"
@@ -163,11 +158,16 @@ export default function Dashboard() {
         </div>
 
         {/* Main Content Tabs */}
-        <Tabs defaultValue="progress" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
+            <TabsTrigger value="analysis">Code Analysis</TabsTrigger>
             <TabsTrigger value="progress">Learning Progress</TabsTrigger>
             <TabsTrigger value="history">Interaction History</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="analysis">
+            <DemoReal />
+          </TabsContent>
 
           <TabsContent value="progress" className="space-y-4">
             {progress.length === 0 ? (
@@ -178,8 +178,8 @@ export default function Dashboard() {
                   <p className="text-muted-foreground mb-4">
                     Start submitting code and explanations to track your learning progress
                   </p>
-                  <Button onClick={() => navigate("/")} className="bg-gradient-to-r from-primary to-secondary">
-                    Try Demo
+                  <Button onClick={() => setActiveTab("analysis")} className="bg-gradient-to-r from-primary to-secondary">
+                    Start Analyzing Code
                   </Button>
                 </CardContent>
               </Card>
@@ -215,7 +215,7 @@ export default function Dashboard() {
                   <p className="text-muted-foreground mb-4">
                     Your submission history will appear here
                   </p>
-                  <Button onClick={() => navigate("/")} className="bg-gradient-to-r from-primary to-secondary">
+                  <Button onClick={() => setActiveTab("analysis")} className="bg-gradient-to-r from-primary to-secondary">
                     Make Your First Submission
                   </Button>
                 </CardContent>
