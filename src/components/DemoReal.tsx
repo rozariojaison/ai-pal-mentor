@@ -106,9 +106,10 @@ export const DemoReal = () => {
     }
   };
 
-  const loadSample = (index: number) => {
+  const loadSample = (index: number, type: "text" | "code") => {
     setSelectedQuestion(index);
-    const questions = activeTab === "code" ? demoQuestions.code : demoQuestions.text;
+    setActiveTab(type);
+    const questions = type === "code" ? demoQuestions.code : demoQuestions.text;
     const question = questions[index];
     setInput(question.content);
     setFeedback(null);
@@ -198,15 +199,33 @@ export const DemoReal = () => {
 
                 <div className="space-y-3">
                   <div className="text-sm font-medium text-muted-foreground">
-                    Sample Questions for Testing:
+                    Code Samples:
                   </div>
                   <div className="grid grid-cols-1 gap-2">
-                    {(activeTab === "code" ? demoQuestions.code : demoQuestions.text).map((question, index) => (
+                    {demoQuestions.code.map((question, index) => (
                       <Button
-                        key={index}
-                        variant={selectedQuestion === index ? "default" : "outline"}
+                        key={`code-${index}`}
+                        variant={activeTab === "code" && selectedQuestion === index ? "default" : "outline"}
                         size="sm"
-                        onClick={() => loadSample(index)}
+                        onClick={() => loadSample(index, "code")}
+                        className="justify-start text-left h-auto py-2"
+                      >
+                        <span className="font-medium">{index + 1}.</span>
+                        <span className="ml-2 truncate">{question.title}</span>
+                      </Button>
+                    ))}
+                  </div>
+                  
+                  <div className="text-sm font-medium text-muted-foreground pt-2">
+                    Explanation Samples:
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    {demoQuestions.text.map((question, index) => (
+                      <Button
+                        key={`text-${index}`}
+                        variant={activeTab === "text" && selectedQuestion === index ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => loadSample(index, "text")}
                         className="justify-start text-left h-auto py-2"
                       >
                         <span className="font-medium">{index + 1}.</span>
