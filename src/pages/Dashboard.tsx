@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,13 +14,17 @@ import {
   Brain,
   Code2,
   FileText,
-  Sparkles
+  Sparkles,
+  ClipboardList
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DemoReal } from "@/components/DemoReal";
+import { TestsTab } from "@/components/student/TestsTab";
+import { LearningPathTab } from "@/components/student/LearningPathTab";
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
+  const { role, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [interactions, setInteractions] = useState<any[]>([]);
@@ -30,6 +35,11 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) {
       navigate("/auth");
+      return;
+    }
+
+    if (!roleLoading && role === 'teacher') {
+      navigate("/teacher-dashboard");
       return;
     }
 
@@ -67,7 +77,7 @@ export default function Dashboard() {
     fetchData();
   }, [user, navigate]);
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Sparkles className="w-8 h-8 animate-spin text-primary" />
@@ -161,12 +171,25 @@ export default function Dashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="analysis">Code Analysis</TabsTrigger>
-            <TabsTrigger value="progress">Learning Progress</TabsTrigger>
-            <TabsTrigger value="history">Interaction History</TabsTrigger>
+            <TabsTrigger value="tests" className="gap-2">
+              <ClipboardList className="w-4 h-4" />
+              Tests
+            </TabsTrigger>
+            <TabsTrigger value="learning-path">Learning Path</TabsTrigger>
+            <TabsTrigger value="progress">Progress</TabsTrigger>
+            <TabsTrigger value="history">History</TabsTrigger>
           </TabsList>
 
           <TabsContent value="analysis">
             <DemoReal />
+          </TabsContent>
+
+          <TabsContent value="tests">
+            <TestsTab />
+          </TabsContent>
+
+          <TabsContent value="learning-path">
+            <LearningPathTab />
           </TabsContent>
 
           <TabsContent value="progress" className="space-y-4">
