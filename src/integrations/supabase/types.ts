@@ -73,6 +73,42 @@ export type Database = {
           },
         ]
       }
+      learning_paths: {
+        Row: {
+          areas_for_improvement: string[] | null
+          current_topic: string
+          id: string
+          next_milestone: string | null
+          recommended_topics: string[] | null
+          skill_level: number | null
+          strengths: string[] | null
+          student_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          areas_for_improvement?: string[] | null
+          current_topic: string
+          id?: string
+          next_milestone?: string | null
+          recommended_topics?: string[] | null
+          skill_level?: number | null
+          strengths?: string[] | null
+          student_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          areas_for_improvement?: string[] | null
+          current_topic?: string
+          id?: string
+          next_milestone?: string | null
+          recommended_topics?: string[] | null
+          skill_level?: number | null
+          strengths?: string[] | null
+          student_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -93,6 +129,48 @@ export type Database = {
           full_name?: string | null
           id?: string
           student_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          created_at: string | null
+          description: string
+          difficulty: string
+          expected_concepts: string[] | null
+          id: string
+          programming_language: string
+          starter_code: string | null
+          teacher_id: string
+          title: string
+          topic: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          difficulty: string
+          expected_concepts?: string[] | null
+          id?: string
+          programming_language?: string
+          starter_code?: string | null
+          teacher_id: string
+          title: string
+          topic: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          difficulty?: string
+          expected_concepts?: string[] | null
+          id?: string
+          programming_language?: string
+          starter_code?: string | null
+          teacher_id?: string
+          title?: string
+          topic?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -154,6 +232,199 @@ export type Database = {
           topic?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      teacher_feedback: {
+        Row: {
+          created_at: string | null
+          feedback_text: string
+          id: string
+          rating: number | null
+          student_id: string
+          submission_id: string | null
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          feedback_text: string
+          id?: string
+          rating?: number | null
+          student_id: string
+          submission_id?: string | null
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string | null
+          feedback_text?: string
+          id?: string
+          rating?: number | null
+          student_id?: string
+          submission_id?: string | null
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_feedback_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "test_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_assignments: {
+        Row: {
+          assigned_at: string | null
+          due_date: string | null
+          id: string
+          student_id: string
+          test_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          due_date?: string | null
+          id?: string
+          student_id: string
+          test_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          due_date?: string | null
+          id?: string
+          student_id?: string
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_assignments_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_questions: {
+        Row: {
+          created_at: string | null
+          id: string
+          order_index: number
+          points: number | null
+          question_id: string
+          test_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          order_index: number
+          points?: number | null
+          question_id: string
+          test_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          order_index?: number
+          points?: number | null
+          question_id?: string
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_questions_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "test_questions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_submissions: {
+        Row: {
+          ai_analysis: Json | null
+          code_submission: string
+          id: string
+          question_id: string
+          score: number | null
+          student_id: string
+          submitted_at: string | null
+          test_id: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          code_submission: string
+          id?: string
+          question_id: string
+          score?: number | null
+          student_id: string
+          submitted_at?: string | null
+          test_id: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          code_submission?: string
+          id?: string
+          question_id?: string
+          score?: number | null
+          student_id?: string
+          submitted_at?: string | null
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_submissions_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "test_submissions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tests: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          is_published: boolean | null
+          teacher_id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_published?: boolean | null
+          teacher_id: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_published?: boolean | null
+          teacher_id?: string
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

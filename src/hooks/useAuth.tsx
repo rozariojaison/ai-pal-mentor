@@ -47,7 +47,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     
     if (!error) {
-      navigate("/dashboard");
+      // Check user role and redirect accordingly
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+        .maybeSingle();
+
+      if (roleData?.role === 'teacher') {
+        navigate("/teacher-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     }
     
     return { error };
@@ -56,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/dashboard`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -67,7 +78,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       },
     });
     
-    if (!error) {
+    if (!error && data.user) {
+      // Default to student role for new signups
+      await supabase.from("user_roles").insert({
+        user_id: data.user.id,
+        role: 'student'
+      });
+      
       navigate("/dashboard");
     }
     
