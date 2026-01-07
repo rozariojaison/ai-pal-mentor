@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAuth } from "@/hooks/useAuth";
-import { Brain, Loader2 } from "lucide-react";
+import { Brain, Loader2, GraduationCap, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -15,8 +16,11 @@ const authSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters").optional(),
 });
 
+type UserRole = "student" | "teacher";
+
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<UserRole>("student");
   const { signIn, signUp } = useAuth();
 
   const handleDemoLogin = async () => {
@@ -68,12 +72,12 @@ export default function Auth() {
 
     try {
       authSchema.parse({ email, password, fullName });
-      const { error } = await signUp(email, password, fullName);
+      const { error } = await signUp(email, password, fullName, selectedRole);
 
       if (error) {
         toast.error(error.message || "Failed to sign up");
       } else {
-        toast.success("Account created successfully!");
+        toast.success(`Account created as ${selectedRole}!`);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -129,7 +133,7 @@ export default function Auth() {
                     id="signin-email"
                     name="email"
                     type="email"
-                    placeholder="student@example.com"
+                    placeholder="your@email.com"
                     required
                   />
                 </div>
@@ -161,6 +165,39 @@ export default function Auth() {
 
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="space-y-3">
+                  <Label>I am a...</Label>
+                  <RadioGroup
+                    value={selectedRole}
+                    onValueChange={(value) => setSelectedRole(value as UserRole)}
+                    className="grid grid-cols-2 gap-3"
+                  >
+                    <Label
+                      htmlFor="role-student"
+                      className={`flex flex-col items-center gap-2 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                        selectedRole === "student"
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <RadioGroupItem value="student" id="role-student" className="sr-only" />
+                      <GraduationCap className={`w-8 h-8 ${selectedRole === "student" ? "text-primary" : "text-muted-foreground"}`} />
+                      <span className={`font-medium ${selectedRole === "student" ? "text-primary" : ""}`}>Student</span>
+                    </Label>
+                    <Label
+                      htmlFor="role-teacher"
+                      className={`flex flex-col items-center gap-2 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                        selectedRole === "teacher"
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <RadioGroupItem value="teacher" id="role-teacher" className="sr-only" />
+                      <BookOpen className={`w-8 h-8 ${selectedRole === "teacher" ? "text-primary" : "text-muted-foreground"}`} />
+                      <span className={`font-medium ${selectedRole === "teacher" ? "text-primary" : ""}`}>Teacher</span>
+                    </Label>
+                  </RadioGroup>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-name">Full Name</Label>
                   <Input
@@ -177,7 +214,7 @@ export default function Auth() {
                     id="signup-email"
                     name="email"
                     type="email"
-                    placeholder="student@example.com"
+                    placeholder="your@email.com"
                     required
                   />
                 </div>
@@ -202,7 +239,7 @@ export default function Auth() {
                       Creating account...
                     </>
                   ) : (
-                    "Sign Up"
+                    `Sign Up as ${selectedRole === "student" ? "Student" : "Teacher"}`
                   )}
                 </Button>
               </form>
