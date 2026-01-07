@@ -25,10 +25,16 @@ export default function Auth() {
 
   const handleDemoStudentLogin = async () => {
     setIsLoading(true);
-    const { error } = await signIn("demo@aipal.com", "demo123");
+    let { error } = await signIn("demo@aipal.com", "demo123");
     
     if (error) {
-      toast.error("Demo student account not available. Please create your own account.");
+      // Try to create the demo account
+      const signUpResult = await signUp("demo@aipal.com", "demo123", "Demo Student", "student");
+      if (signUpResult.error) {
+        toast.error("Could not access demo student account. Please try again.");
+      } else {
+        toast.success("Demo student account created and logged in!");
+      }
     } else {
       toast.success("Logged in as demo student!");
     }
@@ -37,10 +43,16 @@ export default function Auth() {
 
   const handleDemoTeacherLogin = async () => {
     setIsLoading(true);
-    const { error } = await signIn("teacher@aipal.com", "teacher123");
+    let { error } = await signIn("teacher@aipal.com", "teacher123");
     
     if (error) {
-      toast.error("Demo teacher account not available. Please create your own account.");
+      // Try to create the demo teacher account
+      const signUpResult = await signUp("teacher@aipal.com", "teacher123", "Demo Teacher", "teacher");
+      if (signUpResult.error) {
+        toast.error("Could not access demo teacher account. Please try again.");
+      } else {
+        toast.success("Demo teacher account created and logged in!");
+      }
     } else {
       toast.success("Logged in as demo teacher!");
     }
