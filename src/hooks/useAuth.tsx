@@ -3,11 +3,13 @@ import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
 
+type UserRole = "student" | "teacher";
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, role?: UserRole) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   loading: boolean;
 }
@@ -64,8 +66,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error };
   };
 
-  const signUp = async (email: string, password: string, fullName: string) => {
-    const redirectUrl = `${window.location.origin}/dashboard`;
+  const signUp = async (email: string, password: string, fullName: string, role: UserRole = "student") => {
+    const redirectUrl = role === "teacher" 
+      ? `${window.location.origin}/teacher-dashboard`
+      : `${window.location.origin}/dashboard`;
     
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -79,13 +83,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     
     if (!error && data.user) {
-      // Default to student role for new signups
+      // Assign the selected role
       await supabase.from("user_roles").insert({
         user_id: data.user.id,
-        role: 'student'
+        role: role
       });
       
-      navigate("/dashboard");
+      if (role === "teacher") {
+        navigate("/teacher-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     }
     
     return { error };
