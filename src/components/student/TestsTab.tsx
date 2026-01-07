@@ -70,12 +70,14 @@ export const TestsTab = () => {
     const code = submissions[questionId];
     if (!code || !selectedTest) return;
 
+    const question = testQuestions.find(tq => tq.questions.id === questionId)?.questions;
+
     // Call AI analysis edge function
     const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-demo', {
       body: { 
         inputType: 'code',
         inputContent: code,
-        programmingLanguage: 'javascript'
+        programmingLanguage: question?.programming_language || 'javascript'
       }
     });
 
@@ -101,14 +103,58 @@ export const TestsTab = () => {
       return;
     }
 
+    // Update topic progress
+    if (question?.topic) {
+      await updateTopicProgress(question.topic, analysisData?.clarity_score || 50);
+    }
+
     toast.success("Answer submitted successfully");
 
     // Trigger learning path generation (async, don't wait)
-    const question = testQuestions.find(tq => tq.questions.id === questionId)?.questions;
     if (question?.topic) {
       supabase.functions.invoke('generate-learning-path', {
         body: { studentId: user?.id, topic: question.topic }
       }).catch(err => console.error('Learning path generation failed:', err));
+    }
+  };
+
+  const updateTopicProgress = async (topic: string, score: number) => {
+    if (!user?.id) return;
+
+    // Check if topic already exists
+    const { data: existingProgress } = await supabase
+      .from("student_progress")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("topic", topic)
+      .maybeSingle();
+
+    if (existingProgress) {
+      // Update existing topic progress
+      const newInteractionCount = (existingProgress.interactions_count || 0) + 1;
+      const newSkillLevel = Math.min(100, Math.round(
+        ((existingProgress.skill_level || 0) * existingProgress.interactions_count + score) / newInteractionCount
+      ));
+
+      await supabase
+        .from("student_progress")
+        .update({
+          skill_level: newSkillLevel,
+          interactions_count: newInteractionCount,
+          last_interaction_at: new Date().toISOString()
+        })
+        .eq("id", existingProgress.id);
+    } else {
+      // Create new topic progress
+      await supabase
+        .from("student_progress")
+        .insert({
+          user_id: user.id,
+          topic: topic,
+          skill_level: score,
+          interactions_count: 1,
+          last_interaction_at: new Date().toISOString()
+        });
     }
   };
 
