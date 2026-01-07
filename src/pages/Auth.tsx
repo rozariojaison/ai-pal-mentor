@@ -23,14 +23,26 @@ export default function Auth() {
   const [selectedRole, setSelectedRole] = useState<UserRole>("student");
   const { signIn, signUp } = useAuth();
 
-  const handleDemoLogin = async () => {
+  const handleDemoStudentLogin = async () => {
     setIsLoading(true);
     const { error } = await signIn("demo@aipal.com", "demo123");
     
     if (error) {
-      toast.error("Demo account not available. Please create your own account.");
+      toast.error("Demo student account not available. Please create your own account.");
     } else {
-      toast.success("Logged in as demo user!");
+      toast.success("Logged in as demo student!");
+    }
+    setIsLoading(false);
+  };
+
+  const handleDemoTeacherLogin = async () => {
+    setIsLoading(true);
+    const { error } = await signIn("teacher@aipal.com", "teacher123");
+    
+    if (error) {
+      toast.error("Demo teacher account not available. Please create your own account.");
+    } else {
+      toast.success("Logged in as demo teacher!");
     }
     setIsLoading(false);
   };
@@ -101,20 +113,30 @@ export default function Auth() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-4">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={handleDemoLogin}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : null}
-              Quick Demo Login
-            </Button>
-            <p className="text-xs text-muted-foreground text-center mt-2">
+          <div className="mb-4 space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full gap-2"
+                onClick={handleDemoStudentLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GraduationCap className="w-4 h-4" />}
+                Demo Student
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full gap-2"
+                onClick={handleDemoTeacherLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <BookOpen className="w-4 h-4" />}
+                Demo Teacher
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
               Or sign in with your account
             </p>
           </div>
